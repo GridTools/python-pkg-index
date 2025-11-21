@@ -40,8 +40,10 @@ This folder contains the workflows that must be installed into the repos contain
 ### DaCe
 For DaCe the `dace-updater.yml` must be added to the DaCe repo.
 It listens for pushes to tags `__gt4py-next-integration_*`, i.e. the ones that we use to tag our releases.
-
-**TODO:** Figuring out where it should life, because I am sure it must life in `main`.
+There is an [_experimental_ branch](https://github.com/GridTools/dace/pull/12) that tests the workflow using the [development index](https://github.com/philip-paul-mueller/test_package_index).
+It kind of works, however, currently only pushes related to the branch itself are detected, i.e. the branch that contains the workflow file.
+This means, that the workflow file must be included inside `gt4py-next-integration` branch, that is used to deploy the thing, which is not so nice.   
+As an experiment, I changed the defualt branch from `main` to the experimental one, without success, but it might be due to the mentioned "unintended side effects" that a popup was informing me.
 
 
 ## Token
