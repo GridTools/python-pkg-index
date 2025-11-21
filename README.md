@@ -30,9 +30,14 @@ It is usually run by by the workflow automatically.
 A simple script that allows to issue a manual remote update of the index.
 For more information please see its help output.
 
+## `update_workflows`
+This folder contains the workflows that must be installed into the repos containing the dependency.
 
-# How to install a dependency
-TBA:
+### DaCe
+For DaCe the `dace-updater.yml` must be added to the DaCe repo.
+It listens for pushes to tags `__gt4py-next-integration_*`, i.e. the ones that we use to tag our releases.
+
+**TODO:** Figuring out where it should life, because I am sure it must life in `main`.
 
 
 ## Token
