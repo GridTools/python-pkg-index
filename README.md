@@ -10,6 +10,7 @@ The repo is intended to work fully automatically, orchestrated by GitHub actions
 This is the main workflow, in short it does:
 - Pulls the repo, whose package should be updated.
 - Creates a wheel from the repo that has been pulled.
+- Tests if the wheel can be installed.
 - Updated the package index, i.e. regenerates the `index.html` files, for this `generator.py` is used.
 - Creates a commit containing the updated indexes and the generated wheel.
 - Pushes the new commit directly to `main`.
@@ -39,6 +40,3 @@ In order for the _depending_ repo to issue an update request an access token is 
 This can either be a normal (classic) access token, that needs to grant read access to the repository.
 The other possibility is to use a fine grained access token, in which case only the '"Contents" repository permissions (write)' permission has to be granted.
 
-
-# TODO:
-- Test if the wheel can be installed.
