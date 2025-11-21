@@ -62,6 +62,10 @@ jobs:
           CI_COMMIT_EMAIL: username@users.noreply.github.com
         run: |
           cd ./index_repo
+
+          # Not fully sure if this check is useful, because it seems that creating a wheel is not reproducible.
+          #  I.e. creating a wheel from a commit and then generating another wheel will result in a "different",
+          #  in terms of its hash, file than the first time.
           if ! git status --porcelain --untracked-files=no ; then
             # There are no changed.
             echo "There were no changes!"
