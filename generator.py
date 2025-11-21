@@ -55,9 +55,12 @@ def write_project_index(
 
         for file in project_folder.iterdir():
             filename = file.name
-            if filename.startswith("."):
-                continue
-            elif not any(filename.endswith(ext) for ext in [".zip", ".tar.gz", ".whl"]):
+            if filename.startswith(".") or not any(filename.endswith(ext) for ext in [".zip", ".tar.gz", ".whl"]):
+                print(
+                        f"While building the index for project '{project_name}' found non Python package file '{filename}', which will be ignored.",
+                        file=sys.stderr,
+                        flush=True,
+                )
                 continue
             assert filename.startswith(normalized_project_name + "-")
 
