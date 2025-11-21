@@ -1,0 +1,81 @@
+name: |
+  Updates the package index upon an event. Which repo should be updated depends on the
+  `"source_repo"` payload of the request.
+
+on:
+  repository_dispatch:
+    types: [update_package_index]
+  workflow_dispatch:
+    inputs:
+      source_repo:
+        description: 'Name of the repo that contains the dependency.'
+        required: true
+        type: string
+      source_org:
+        description: 'Name of the organization/user that owns the dependency repo.'
+        required: true
+        type: string
+      dependency_ref:
+        description: 'Reference that in the dependency repo that should be checked out and turned into a dependency.'
+        required: true
+        type: string
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print all variables
+        shell: bash
+        run: |
+          echo "source_repo: ${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
+          echo "source_org:  ${{ inputs.source_org == '' && github.event.client_payload.source_org || inputs.source_org }}"
+          echo "dep_ref:     ${{ inputs.dependency_ref == '' && github.event.client_payload.dependency_ref || inputs.dependency_ref }}"
+
+      - name: Checkout `master` branch of the index repo.
+        uses: actions/checkout@v4
+        with:
+          path: index_repo
+          ref: master    # We always work on master!
+
+      - name: Checkout the dependency that should be updated in the index.
+        uses: actions/checkout@v4
+        with:
+          # Everything we pull is publich, so no token needed.
+          repository: ${{ inputs.source_org == '' && github.event.client_payload.source_org || inputs.source_org }}/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}
+          path: ${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}
+          submodules: 'recursive'
+          ref: ${{ inputs.dependency_ref == '' && github.event.client_payload.dependency_ref || inputs.dependency_ref }}
+
+      - name: Build the distribution.
+        shell: bash
+        run: |
+          DEPENDENCY_REPO="${PWD}/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
+          DIST_FOLDER="${PWD}/index_repo/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
+
+          cd "${DEPENDENCY_REPO}"
+          python -m pip install build --user
+          python -m build --wheel --outdir "${DIST_FOLDER}"
+
+      - name: Create a PR in the index repo
+        shell: bash
+        env:
+          CI_COMMIT_MESSAGE: updated dependency "${{ inputs.source_org == '' && github.event.client_payload.source_org || inputs.source_org }}/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
+          CI_COMMIT_AUTHOR: github-actions[bot]
+          CI_COMMIT_EMAIL: username@users.noreply.github.com
+        run: |
+          cd ./index_repo
+          if ! git status --porcelain --untracked-files=no ; then
+            # There are no changed.
+            echo "There were no changes!"
+            exit 0
+          fi
+
+          # Update all the packages.
+          python generator.py
+
+          # We directly push to master.
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
+          git add .
+          git commit --no-verify -m "${CI_COMMIT_MESSAGE}"
+          git push origin master
