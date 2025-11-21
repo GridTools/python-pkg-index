@@ -3,6 +3,9 @@ name: Updates the Python package index upon an event.
 on:
   repository_dispatch:
     types: [update_package_index]
+
+  # According to the [documentation](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow#configuring-a-workflow-to-run-manually)
+  # it is only possible to trigger a workflow manually, if it is located in the default branch.
   workflow_dispatch:
     inputs:
       source_repo:
@@ -17,6 +20,7 @@ on:
         description: 'Reference that in the dependency repo that should be checked out and turned into a dependency.'
         required: true
         type: string
+
   # We need this until this file is not in `main`, without it the web interface will not pick it up.
   #  See https://stackoverflow.com/a/71057825
   #pull_request:

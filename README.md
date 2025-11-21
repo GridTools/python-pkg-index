@@ -21,6 +21,10 @@ In either case some information have to be provided:
 - The owner (user or organization) that owns the repo, generally referred to as "source owner".
 - The branch of the repo from which a Python package should be created, generally referred to as "dependency ref".
 
+> According to the [documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#repository_dispatch) the
+> `repository_dispatch` trigger (the one that is used such that _other_ repo can start the update) only works when
+> the workflow file is located on the default branch!
+
 ## `generator.py`
 Script for updating the static pages.
 It works by scanning subfolders, currently `dace` and `ghex`, and creates an index based on all Python packages it founds in them.
