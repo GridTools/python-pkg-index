@@ -40,3 +40,8 @@ In order for the _depending_ repo to issue an update request an access token is 
 This can either be a normal (classic) access token, that needs to grant read access to the repository.
 The other possibility is to use a fine grained access token, in which case only the '"Contents" repository permissions (write)' permission has to be granted.
 
+# TODO:
+- Install in DaCe
+- Install in GHEX
+- Configure the page to use `main` as source.
+

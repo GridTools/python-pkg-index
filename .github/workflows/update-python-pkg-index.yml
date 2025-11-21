@@ -17,6 +17,9 @@ on:
         description: 'Reference that in the dependency repo that should be checked out and turned into a dependency.'
         required: true
         type: string
+  # We need this until this file is not in `main`, without it the web interface will not pick it up.
+  #  See https://stackoverflow.com/a/71057825
+  pull_request:
 
 jobs:
   update-index:
