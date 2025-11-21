@@ -1,6 +1,4 @@
-name: |
-  Updates the package index upon an event. Which repo should be updated depends on the
-  `"source_repo"` payload of the request.
+name: Updates the Python package index upon an event. 
 
 on:
   repository_dispatch:
@@ -31,32 +29,32 @@ jobs:
           echo "source_org:  ${{ inputs.source_org == '' && github.event.client_payload.source_org || inputs.source_org }}"
           echo "dep_ref:     ${{ inputs.dependency_ref == '' && github.event.client_payload.dependency_ref || inputs.dependency_ref }}"
 
-      - name: Checkout `master` branch of the index repo.
+      - name: Checkout the `main` branch of the Python package index.
         uses: actions/checkout@v4
         with:
           path: index_repo
-          ref: master    # We always work on master!
+          ref: main    # We always work on main!
 
-      - name: Checkout the dependency that should be updated in the index.
+      - name: Checkout the repo of the dependency that should be added to the index.
         uses: actions/checkout@v4
         with:
-          # Everything we pull is publich, so no token needed.
           repository: ${{ inputs.source_org == '' && github.event.client_payload.source_org || inputs.source_org }}/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}
           path: ${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}
           submodules: 'recursive'
           ref: ${{ inputs.dependency_ref == '' && github.event.client_payload.dependency_ref || inputs.dependency_ref }}
 
-      - name: Build the distribution.
+      - name: Build the distribution file.
         shell: bash
         run: |
           DEPENDENCY_REPO="${PWD}/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
           DIST_FOLDER="${PWD}/index_repo/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
 
+          # TODO: Test if we can install it.
           cd "${DEPENDENCY_REPO}"
           python -m pip install build --user
           python -m build --wheel --outdir "${DIST_FOLDER}"
 
-      - name: Create a PR in the index repo
+      - name: Rescan the package index and update the static `index.html` files.
         shell: bash
         env:
           CI_COMMIT_MESSAGE: updated dependency "${{ inputs.source_org == '' && github.event.client_payload.source_org || inputs.source_org }}/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
@@ -73,9 +71,9 @@ jobs:
           # Update all the packages.
           python generator.py
 
-          # We directly push to master.
+          # We directly push to main!
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
           git add .
           git commit --no-verify -m "${CI_COMMIT_MESSAGE}"
-          git push origin master
+          git push origin main
