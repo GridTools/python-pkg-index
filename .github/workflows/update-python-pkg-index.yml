@@ -31,6 +31,7 @@ jobs:
           echo "source_repo: ${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
           echo "source_org:  ${{ inputs.source_org == '' && github.event.client_payload.source_org || inputs.source_org }}"
           echo "dep_ref:     ${{ inputs.dependency_ref == '' && github.event.client_payload.dependency_ref || inputs.dependency_ref }}"
+          echo "payload:     ${{ toJson(github.event.client_payload) }}"
 
       - name: Checkout the `main` branch of the Python package index.
         uses: actions/checkout@v4
