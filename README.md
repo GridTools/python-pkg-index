@@ -3,8 +3,10 @@ This repo hosts the custom packages that are needed to use GT4Py, these currentl
 - [GridTools/dace](https://github.com/GridTools/dace), currently only for the `next`.
 - [ghex-org/GHEX](https://github.com/ghex-org/GHEX)
 
+
 # Usage
 The repo is intended to work fully automatically, orchestrated by GitHub actions.
+See also the design section below.
 
 ## Workflow `update-python-pkg-index.yml`
 This is the main workflow, in short it does:
@@ -36,6 +38,7 @@ For more information please see its help output.
 
 ## `update_workflows`
 This folder contains the workflows that must be installed into the repos containing the dependency.
+These workflows then triggers the update chain.
 
 ### DaCe
 For DaCe the `dace-updater.yml` must be added to the DaCe repo.
@@ -43,13 +46,22 @@ It listens for pushes to tags `__gt4py-next-integration_*`, i.e. the ones that w
 There is an [_experimental_ branch](https://github.com/GridTools/dace/pull/12) that tests the workflow using the [development index](https://github.com/philip-paul-mueller/test_package_index).
 It kind of works, however, currently only pushes related to the branch itself are detected, i.e. the branch that contains the workflow file.
 This means, that the workflow file must be included inside `gt4py-next-integration` branch, that is used to deploy the thing, which is not so nice.   
-As an experiment, I changed the defualt branch from `main` to the experimental one, without success, but it might be due to the mentioned "unintended side effects" that a popup was informing me.
-
+As an experiment, I changed the default branch from `main` to the experimental one, without success, but it might be due to the mentioned "unintended side effects" that a popup was informing me.
 
 ## Token
 In order for the _depending_ repo to issue an update request an access token is needed.
 This can either be a normal (classic) access token, that needs to grant read access to the repository.
 The other possibility is to use a fine grained access token, in which case only the '"Contents" repository permissions (write)' permission has to be granted.
+
+
+# Design and Working
+The index works currently in "pull mode".
+This means that the dependent repos, i.e. DaCe or GHEX, informs the index (this repo), that a new version is available.
+The index will then download the depending repo, build the Python package and update the html pages.
+
+However, it would be conceptually simpler, if the index is passive, i.e. if the dependent repos would build the Python package themself and push it to the index.
+This design, "push mode", should become the new operation mode in the future.
+
 
 # TODO:
 - Install in DaCe
