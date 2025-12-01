@@ -7,6 +7,9 @@ import pathlib
 import re
 import sys
 
+#: The header for a html page.
+#: It contains the opening `<body>` tag and has the `Titel` interpolation.
+"""
 HTML_HEADER: Final[str] = """\
 <!DOCTYPE HTML>
 <html>
@@ -17,10 +20,6 @@ HTML_HEADER: Final[str] = """\
 
     <body>
     <h1>{Title}</h1>
-"""
-"""The header for a html page.
-
-It contains the opening `<body>` tag and has the `Titel` interpolation.
 """
 
 HTML_FOOTER: Final[str] = """\
