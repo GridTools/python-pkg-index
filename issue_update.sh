@@ -98,7 +98,7 @@ then
 	exit 1
 fi
 
-curl -L -v \
+curl -L -v --fail-with-body \
   -X POST \
   -H "Accept: application/vnd.github+json" \
   -H "Authorization: Bearer $(cat .token)" \
