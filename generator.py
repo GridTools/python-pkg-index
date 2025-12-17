@@ -38,6 +38,11 @@ def write_project_index(
     base_folder: pathlib.Path,
     project_name: str,
 ) -> int:
+    """Generate the `index.html` file for a package.
+
+    If no archive file was detected no `index.html` file is generated.
+    """
+
     # Project folder must exists because we assume that the files are located inside.
     project_folder = base_folder / project_name
     if not project_folder.is_dir():
@@ -47,8 +52,9 @@ def write_project_index(
 
     found_packages = 0
     normalized_project_name = normalize_name(project_name)
-    with open(project_folder / "index.html", "wt") as index:
-        index.write(HTML_HEADER.format(Title=f"Custom Package for '{project_name}'"))
+    package_level_index_file = project_folder / "index.html"
+    with open(package_level_index_file, "wt") as package_level_index:
+        package_level_index.write(HTML_HEADER.format(Title=f"Custom Package for '{project_name}'"))
 
         for file in project_folder.iterdir():
             filename = file.name
@@ -68,13 +74,17 @@ def write_project_index(
             # PEP503 says that the text of the anchor element must be the filename, so there
             #  is not need for fancy processing of the file name. Furthermore, we assume that
             #  the file names have the correct normalized name and version.
-            index.write(
+            package_level_index.write(
                 f'\t\t<a href="{filename}#sha256={digest.hexdigest()}">{filename}</a> </br>\n'.replace("\t", "    ")
             )
             found_packages += 1
-        index.write(HTML_FOOTER)
+        package_level_index.write(HTML_FOOTER)
 
-        return found_packages
+    # If no package file was found remove the `index.html` file that was generated before.
+    if found_packages == 0:
+        package_level_index_file.unlink()
+
+    return found_packages
 
 
 def write_package_index(
@@ -82,8 +92,8 @@ def write_package_index(
     packages: Sequence[str],
 ) -> None:
 
-    with open(base_folder / "index.html", "wt") as index:
-        index.write(HTML_HEADER.format(Title=f"Custom Package Index for GT4Py"))
+    with open(base_folder / "index.html", "wt") as top_level_index:
+        top_level_index.write(HTML_HEADER.format(Title=f"Custom Package Index for GT4Py"))
 
         for project_name in packages:
             project_folder = base_folder / project_name
@@ -100,8 +110,8 @@ def write_package_index(
             found_packages = write_project_index(base_folder, project_name)
 
             if found_packages == 0:
-                # Consider no packages not as an error, only output a warning.
-                # TODO: Consider removing the folder.
+                # Consider "no packages" not as an error, only output a warning.
+                package_index_file = project_folder / "index.html"
                 print(
                     f"No packages for project `{project_name}` could be located.",
                     flush=True,
@@ -109,9 +119,10 @@ def write_package_index(
                 )
                 continue
 
-            index.write(f'\t\t<a href="{project_name}">{normalized_project_name}</a>\n'.replace("\t", "    "))
+            # Add an entry to the top level `index.html` file.
+            top_level_index.write(f'\t\t<a href="{project_name}">{normalized_project_name}</a>\n'.replace("\t", "    "))
 
-        index.write(HTML_FOOTER)
+        top_level_index.write(HTML_FOOTER)
 
 
 if __name__ == "__main__":
