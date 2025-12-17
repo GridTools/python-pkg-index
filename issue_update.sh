@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Location of the repo that hosts the actuall index.
-INDEX_REPO="test_package_index"
-INDEX_ORGANIZATION="philip-paul-mueller"
+INDEX_REPO="python-pkg-index"
+INDEX_ORGANIZATION="gridtools"
 SCRIPT_FOLDER="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 
 SOURCE_REPO=""
