@@ -111,7 +111,6 @@ def write_package_index(
 
             if found_packages == 0:
                 # Consider "no packages" not as an error, only output a warning.
-                package_index_file = project_folder / "index.html"
                 print(
                     f"No packages for project `{project_name}` could be located.",
                     flush=True,
