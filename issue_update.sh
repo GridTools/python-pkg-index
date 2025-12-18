@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Location of the repo that hosts the actuall index.
-INDEX_REPO="test_package_index"
-INDEX_ORGANIZATION="philip-paul-mueller"
+INDEX_ORGANIZATION="gridtools"
+INDEX_REPO="python-pkg-index"
 SCRIPT_FOLDER="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 
 SOURCE_REPO=""
@@ -98,10 +98,20 @@ then
 	exit 1
 fi
 
-curl -L -v \
-  -X POST \
-  -H "Accept: application/vnd.github+json" \
-  -H "Authorization: Bearer $(cat .token)" \
-  -H "X-GitHub-Api-Version: 2022-11-28" \
-  "https://api.github.com/repos/${INDEX_ORGANIZATION}/${INDEX_REPO}/dispatches" \
-  -d '{"event_type":"update_package_index","client_payload":{"source_repo":"'"${SOURCE_REPO}"'","source_org":"'"${SOURCE_ORG}"'","dependency_ref":"'"${DEPENDENCY_REF}"'"}}'
+curl -L -v --fail-with-body \
+	-X POST \
+	-H "Accept: application/vnd.github+json" \
+	-H "Authorization: Bearer $(cat .token)" \
+	-H "X-GitHub-Api-Version: 2022-11-28" \
+  	"https://api.github.com/repos/${INDEX_ORGANIZATION}/${INDEX_REPO}/dispatches" \
+  	-d '{"event_type":"update_package_index","client_payload":{"source_repo":"'"${SOURCE_REPO}"'","source_org":"'"${SOURCE_ORG}"'","dependency_ref":"'"${DEPENDENCY_REF}"'"}}'
+CURL_RET=$?
+
+if [ "${CURL_RET}" -ne 0 ]
+then
+	echo "POST to '${INDEX_ORGANIZATION}:${INDEX_REPO}' failed with error code '${CURL_RET}'"
+	exit 1
+fi
+
+exit 0
+

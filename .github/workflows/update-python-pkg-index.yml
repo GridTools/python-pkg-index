@@ -65,6 +65,8 @@ jobs:
         shell: bash
         run: |
           PACKAGE_BUILD_FOLDER="${PWD}/index_repo/build"
+          # No need to normalize the folder name here. Normalization is done through the
+          #  normalized anchor name in the top level `index.html` file.
           DESTINATION_FOLDER="${PWD}/index_repo/${{ inputs.source_repo == '' && github.event.client_payload.source_repo || inputs.source_repo }}"
           mkdir -p "${DESTINATION_FOLDER}"
 
@@ -109,3 +111,5 @@ jobs:
           git add .
           git commit --no-verify -m "${CI_COMMIT_MESSAGE}"
           git push origin main
+
+          exit $?
