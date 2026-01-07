@@ -2,7 +2,7 @@
 
 # Location of the repo that hosts the actuall index.
 INDEX_ORGANIZATION="gridtools"
-INDEX_REPO="python-pkg-index"
+INDEX_REPO="pypi"
 SCRIPT_FOLDER="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 
 SOURCE_REPO=""
